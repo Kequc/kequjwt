@@ -1,0 +1,43 @@
+{
+  "name": "kequjwt",
+  "version": "0.1.0",
+  "description": "Easy headless jwt tokens",
+  "main": "dist/kequjwt.js",
+  "types": "dist/kequjwt.d.ts",
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "test": "kequtest --ts",
+    "lint": "eslint ."
+  },
+  "author": "Nathan Lunde-Berry",
+  "license": "ISC",
+  "engines": {
+    "node": ">= 15.7.0"
+  },
+  "bugs": {
+    "url": "https://github.com/Kequc/kequjwt/issues"
+  },
+  "homepage": "https://github.com/Kequc/kequjwt#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Kequc/kequjwt.git"
+  },
+  "keywords": [
+    "jwt",
+    "token",
+    "encode",
+    "decode",
+    "json",
+    "headless"
+  ],
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/node": "^18.11.8",
+    "eslint": "^8.26.0",
+    "kequtest": "^1.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  }
+}
