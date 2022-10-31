@@ -25,7 +25,7 @@ Decode will throw an error if the token is invalid or unable to be verified. The
 
 ## JWT invalidation
 
-To set an expiry date or not before date use `'exp'` and `'nbf'` measured in seconds.
+To set a not before or expiry date use `'exp'` and `'nbf'` measured in seconds.
 
 ```typescript
 const time = Math.floor(Date.now() / 1000);
@@ -39,7 +39,7 @@ const payload = {
 
 ## JWT header
 
-The header is equivalent to base64 encoded `'{ typ: "JWT", alg: "HS256" }'` and can be accessed using `jwt.header` if needed for any reason.
+The header is equivalent to base64url encoded `'{ typ: "JWT", alg: "HS256" }'` and can be accessed using `jwt.header` if needed for any reason.
 
 ```typescript
 const fullToken = `${jwt.header}.${token}`;

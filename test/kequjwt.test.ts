@@ -41,6 +41,16 @@ describe('kequjwt', () => {
         }
     });
 
+    it('fails to decode tampered token', () => {
+        const message = jwt.ERROR.SIGNATURE_FAILED;
+        const key = EXAMPLES[0].key;
+        const source = EXAMPLES[0].token;
+        const target = EXAMPLES[1].token;
+        const token = `${target.split('.')[0]}.${source.split('.')[1]}`;
+
+        assert.throws(() => jwt.decode(token, key), { message });
+    });
+
     it('decodes timed token', () => {
         const payload = { nbf: plusHours(-1), exp: plusHours(1) };
         const key = 'secret';
