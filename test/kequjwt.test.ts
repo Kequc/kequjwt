@@ -33,7 +33,7 @@ describe('kequjwt', () => {
         }
     });
 
-    it('fails to decode with invalid key', () => {
+    it('fails to decode using invalid key', () => {
         const message = jwt.ERROR.SIGNATURE_FAILED;
 
         for (const { token, key } of EXAMPLES) {
@@ -44,9 +44,19 @@ describe('kequjwt', () => {
     it('fails to decode tampered token', () => {
         const message = jwt.ERROR.SIGNATURE_FAILED;
         const key = EXAMPLES[0].key;
-        const source = EXAMPLES[0].token;
-        const target = EXAMPLES[1].token;
-        const token = `${target.split('.')[0]}.${source.split('.')[1]}`;
+        const signature = EXAMPLES[0].token.split('.')[1];
+        const wrongPayload = EXAMPLES[1].token.split('.')[0];
+        const token = `${wrongPayload}.${signature}`;
+
+        assert.throws(() => jwt.decode(token, key), { message });
+    });
+
+    it('fails to decode frankentoken', () => {
+        const message = jwt.ERROR.SIGNATURE_FAILED;
+        const key = EXAMPLES[0].key;
+        const wrongSignature = EXAMPLES[1].token.split('.')[1];
+        const payload = EXAMPLES[0].token.split('.')[0];
+        const token = `${payload}.${wrongSignature}`;
 
         assert.throws(() => jwt.decode(token, key), { message });
     });
