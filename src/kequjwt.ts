@@ -1,8 +1,6 @@
 import { createHmac } from 'crypto';
 
-type TPayload = { [name: string]: any };
-
-const header = base64Encode({ typ: 'JWT', alg: 'HS256' });
+type Payload = { [name: string]: any };
 
 enum ERROR {
     PAYLOAD_INVALID = 'Payload must be an object',
@@ -14,7 +12,9 @@ enum ERROR {
     TOKEN_EXP = 'Token expired'
 }
 
-function encode (payload: TPayload, key: string): string {
+const header = base64Encode({ typ: 'JWT', alg: 'HS256' });
+
+function encode (payload: Payload, key: string): string {
     if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
         throw new Error(ERROR.PAYLOAD_INVALID);
     }
@@ -28,7 +28,7 @@ function encode (payload: TPayload, key: string): string {
     return `${encoded}.${signature}`;
 }
 
-function decode (token: string, key: string): TPayload {
+function decode (token: string, key: string): Payload {
     if (typeof token !== 'string' || !token) {
         throw new Error(ERROR.TOKEN_REQUIRED);
     }
@@ -37,13 +37,11 @@ function decode (token: string, key: string): TPayload {
     }
 
     const segments = token.split('.');
-
-    if (segments.length !== 2 || !segments[0] || !segments[1]) {
-        throw new Error(ERROR.TOKEN_INVALID);
-    }
-
     const [encoded, signature] = segments;
 
+    if (segments.length !== 2 || !encoded || !signature) {
+        throw new Error(ERROR.TOKEN_INVALID);
+    }
     if (signature !== sign(encoded, key)) {
         throw new Error(ERROR.SIGNATURE_FAILED);
     }
@@ -72,10 +70,10 @@ function sign (encoded: string, key: string): string {
     return createHmac('sha256', key).update(`${header}.${encoded}`).digest('base64url');
 }
 
-function base64Encode (payload: TPayload): string {
+function base64Encode (payload: Payload): string {
     return Buffer.from(JSON.stringify(payload)).toString('base64url');
 }
 
-function base64Decode (encoded: string): TPayload {
+function base64Decode (encoded: string): Payload {
     return JSON.parse(Buffer.from(encoded, 'base64url').toString());
 }
