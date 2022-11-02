@@ -12,8 +12,6 @@ enum ERROR {
     TOKEN_EXP = 'Token expired'
 }
 
-const header = base64Encode({ typ: 'JWT', alg: 'HS256' });
-
 function encode (payload: Payload, key: string): string {
     if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
         throw new Error(ERROR.PAYLOAD_INVALID);
@@ -58,6 +56,8 @@ function decode (token: string, key: string): Payload {
 
     return payload;
 }
+
+const header = base64Encode({ typ: 'JWT', alg: 'HS256' });
 
 export default {
     encode,
