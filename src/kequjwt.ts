@@ -51,11 +51,11 @@ function decode (token: string, key: string): TPayload {
     const payload = base64Decode(encoded);
     const time = Math.floor(Date.now() / 1000);
 
-    if (typeof payload.nbf === 'number' && time < payload.nbf) {
-        throw new Error(ERROR.TOKEN_NBF);
-    }
     if (typeof payload.exp === 'number' && time >= payload.exp) {
         throw new Error(ERROR.TOKEN_EXP);
+    }
+    if (typeof payload.nbf === 'number' && time < payload.nbf) {
+        throw new Error(ERROR.TOKEN_NBF);
     }
 
     return payload;

@@ -42,47 +42,56 @@ describe('kequjwt', () => {
     });
 
     it('fails to decode tampered token', () => {
-        const message = jwt.ERROR.SIGNATURE_FAILED;
         const key = EXAMPLES[0].key;
+        const wrongEncoded = EXAMPLES[1].token.split('.')[0];
         const signature = EXAMPLES[0].token.split('.')[1];
-        const wrongPayload = EXAMPLES[1].token.split('.')[0];
-        const token = `${wrongPayload}.${signature}`;
+        const token = `${wrongEncoded}.${signature}`;
+        const message = jwt.ERROR.SIGNATURE_FAILED;
 
         assert.throws(() => jwt.decode(token, key), { message });
     });
 
     it('fails to decode frankentoken', () => {
-        const message = jwt.ERROR.SIGNATURE_FAILED;
         const key = EXAMPLES[0].key;
+        const encoded = EXAMPLES[0].token.split('.')[0];
         const wrongSignature = EXAMPLES[1].token.split('.')[1];
-        const payload = EXAMPLES[0].token.split('.')[0];
-        const token = `${payload}.${wrongSignature}`;
+        const token = `${encoded}.${wrongSignature}`;
+        const message = jwt.ERROR.SIGNATURE_FAILED;
 
         assert.throws(() => jwt.decode(token, key), { message });
     });
 
     it('decodes timed token', () => {
-        const payload = { nbf: plusHours(-1), exp: plusHours(1) };
         const key = 'secret';
+        const payload = { nbf: plusHours(-1), exp: plusHours(1) };
         const token = jwt.encode(payload, key);
 
         assert.deepStrictEqual(jwt.decode(token, key), payload);
     })
 
-    it('fails to decode expired token', () => {
-        const payload = { exp: plusHours(-1) };
+    it('fails to decode not yet valid token', () => {
         const key = 'secret';
+        const payload = { nbf: plusHours(1) };
+        const token = jwt.encode(payload, key);
+        const message = jwt.ERROR.TOKEN_NBF;
+
+        assert.throws(() => jwt.decode(token, key), { message });
+    });
+
+    it('fails to decode expired token', () => {
+        const key = 'secret';
+        const payload = { exp: plusHours(-1) };
         const token = jwt.encode(payload, key);
         const message = jwt.ERROR.TOKEN_EXP;
 
         assert.throws(() => jwt.decode(token, key), { message });
     });
 
-    it('fails to decode not yet valid token', () => {
-        const payload = { nbf: plusHours(1) };
+    it('validates expiry first', () => {
         const key = 'secret';
+        const payload = { nbf: plusHours(1), exp: plusHours(-1) };
         const token = jwt.encode(payload, key);
-        const message = jwt.ERROR.TOKEN_NBF;
+        const message = jwt.ERROR.TOKEN_EXP;
 
         assert.throws(() => jwt.decode(token, key), { message });
     });
