@@ -34,10 +34,9 @@ function decode (token: string, key: string): Payload {
         throw new Error(ERROR.KEY_REQUIRED);
     }
 
-    const segments = token.split('.');
-    const [encoded, signature] = segments;
+    const { encoded, signature } = extractSegments(token);
 
-    if (segments.length !== 2 || !encoded || !signature) {
+    if (!encoded || !signature) {
         throw new Error(ERROR.TOKEN_INVALID);
     }
     if (signature !== sign(encoded, key)) {
@@ -65,6 +64,15 @@ export default {
     header,
     ERROR
 };
+
+function extractSegments (token: string): { encoded: string, signature: string } {
+    const segments = token.split('.');
+    if (segments.length > 2) segments.shift();
+
+    const [encoded, signature] = segments;
+
+    return { encoded, signature };
+}
 
 function sign (encoded: string, key: string): string {
     return createHmac('sha256', key).update(`${header}.${encoded}`).digest('base64url');

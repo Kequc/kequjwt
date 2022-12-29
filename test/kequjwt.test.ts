@@ -33,6 +33,12 @@ describe('kequjwt', () => {
         }
     });
 
+    it('decodes a full token', () => {
+        for (const { payload, token, key } of EXAMPLES) {
+            assert.deepStrictEqual(jwt.decode(`${jwt.header}.${token}`, key), payload);
+        }
+    });
+
     it('fails to decode using invalid key', () => {
         const message = jwt.ERROR.SIGNATURE_FAILED;
 
