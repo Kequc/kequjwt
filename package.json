@@ -1,6 +1,6 @@
 {
   "name": "kequjwt",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Easy headless jwt tokens",
   "main": "dist/kequjwt.js",
   "types": "dist/kequjwt.d.ts",
