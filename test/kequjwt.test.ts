@@ -67,6 +67,26 @@ describe('kequjwt', () => {
         assert.throws(() => jwt.decode(token, key), { message });
     });
 
+    it('fails to decode nonsense token', () => {
+        const key = EXAMPLES[0].key;
+        const nonsenseEncoded = EXAMPLES[0].token.split('.')[0].replace('I', 'i');
+        const signature = EXAMPLES[0].token.split('.')[1];
+        const token = `${nonsenseEncoded}.${signature}`;
+        const message = jwt.ERROR.SIGNATURE_FAILED;
+
+        assert.throws(() => jwt.decode(token, key), { message });
+    });
+
+    it('fails to decode nonsense signature', () => {
+        const key = EXAMPLES[0].key;
+        const encoded = EXAMPLES[0].token.split('.')[0];
+        const nonsenseSignature = EXAMPLES[0].token.split('.')[1].replace('K', 'k');
+        const token = `${encoded}.${nonsenseSignature}`;
+        const message = jwt.ERROR.SIGNATURE_FAILED;
+
+        assert.throws(() => jwt.decode(token, key), { message });
+    });
+
     it('decodes timed token', () => {
         const key = 'secret';
         const payload = { nbf: plusHours(-1), exp: plusHours(1) };

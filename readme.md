@@ -23,6 +23,14 @@ jwt.decode(token, key);
 
 Decode will throw an error if the token is invalid or unable to be verified. The generated token is headless meaning it contains only the `payload` and `signature` segments of the jwt.
 
+## JWT header
+
+The header is equivalent to base64url encoded `{ typ: 'JWT', alg: 'HS256' }` and can be accessed using `jwt.header` if needed for any reason.
+
+```typescript
+const fullToken = `${jwt.header}.${token}`;
+```
+
 ## JWT invalidation
 
 To set a not before or expiry date use `'nbf'` and `'exp'` measured in seconds.
@@ -35,14 +43,6 @@ const payload = {
     nbf: time,
     exp: time + (60 * 60) // 1 hour
 };
-```
-
-## JWT header
-
-The header is equivalent to base64url encoded `{ typ: 'JWT', alg: 'HS256' }` and can be accessed using `jwt.header` if needed for any reason.
-
-```typescript
-const fullToken = `${jwt.header}.${token}`;
 ```
 
 ## Suggestions

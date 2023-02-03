@@ -13,12 +13,8 @@ enum ERROR {
 }
 
 function encode (payload: Payload, key: string): string {
-    if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
-        throw new Error(ERROR.PAYLOAD_INVALID);
-    }
-    if (typeof key !== 'string' || !key) {
-        throw new Error(ERROR.KEY_REQUIRED);
-    }
+    validate(ERROR.PAYLOAD_INVALID, typeof payload !== 'object' || payload === null || Array.isArray(payload));
+    validate(ERROR.KEY_REQUIRED, typeof key !== 'string' || !key);
 
     const encoded = base64Encode(payload);
     const signature = sign(encoded, key);
@@ -27,31 +23,21 @@ function encode (payload: Payload, key: string): string {
 }
 
 function decode (token: string, key: string): Payload {
-    if (typeof token !== 'string' || !token) {
-        throw new Error(ERROR.TOKEN_REQUIRED);
-    }
-    if (typeof key !== 'string' || !key) {
-        throw new Error(ERROR.KEY_REQUIRED);
-    }
+    validate(ERROR.TOKEN_REQUIRED, typeof token !== 'string' || !token);
+    validate(ERROR.KEY_REQUIRED, typeof key !== 'string' || !key);
 
-    const { encoded, signature } = extractSegments(token);
+    const segments = token.split('.');
+    const signature = segments.pop();
+    const encoded = segments.pop();
 
-    if (!encoded || !signature) {
-        throw new Error(ERROR.TOKEN_INVALID);
-    }
-    if (signature !== sign(encoded, key)) {
-        throw new Error(ERROR.SIGNATURE_FAILED);
-    }
+    validate(ERROR.TOKEN_INVALID, !encoded || !signature);
+    validate(ERROR.SIGNATURE_FAILED, signature !== sign(encoded!, key));
 
-    const payload = base64Decode(encoded);
+    const payload = base64Decode(encoded!);
     const time = Math.floor(Date.now() / 1000);
 
-    if (typeof payload.exp === 'number' && time >= payload.exp) {
-        throw new Error(ERROR.TOKEN_EXP);
-    }
-    if (typeof payload.nbf === 'number' && time < payload.nbf) {
-        throw new Error(ERROR.TOKEN_NBF);
-    }
+    validate(ERROR.TOKEN_EXP, typeof payload.exp === 'number' && time >= payload.exp);
+    validate(ERROR.TOKEN_NBF, typeof payload.nbf === 'number' && time < payload.nbf);
 
     return payload;
 }
@@ -65,15 +51,6 @@ export default {
     ERROR
 };
 
-function extractSegments (token: string): { encoded: string, signature: string } {
-    const segments = token.split('.');
-    if (segments.length > 2) segments.shift();
-
-    const [encoded, signature] = segments;
-
-    return { encoded, signature };
-}
-
 function sign (encoded: string, key: string): string {
     return createHmac('sha256', key).update(`${header}.${encoded}`).digest('base64url');
 }
@@ -84,4 +61,8 @@ function base64Encode (payload: Payload): string {
 
 function base64Decode (encoded: string): Payload {
     return JSON.parse(Buffer.from(encoded, 'base64url').toString());
+}
+
+function validate (message: ERROR, value: boolean): void {
+    if (value) throw new Error(message);
 }
