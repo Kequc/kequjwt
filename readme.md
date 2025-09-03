@@ -9,7 +9,7 @@ npm i kequjwt
 ```
 
 ```typescript
-import jwt from 'kequjwt';
+import * as jwt from 'kequjwt';
 
 const payload = { hello: 'world' };
 const key = 'secret';

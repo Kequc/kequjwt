@@ -2,7 +2,7 @@ import { createHmac } from 'crypto';
 
 type Payload = { [name: string]: any };
 
-enum ERROR {
+export enum ERROR {
     PAYLOAD_INVALID = 'Payload must be an object',
     KEY_REQUIRED = 'Key is required',
     TOKEN_REQUIRED = 'Token is required',
@@ -12,7 +12,7 @@ enum ERROR {
     TOKEN_EXP = 'Token expired'
 }
 
-function encode (payload: Payload, key: string): string {
+export function encode (payload: Payload, key: string): string {
     validate(ERROR.PAYLOAD_INVALID, typeof payload !== 'object' || payload === null || Array.isArray(payload));
     validate(ERROR.KEY_REQUIRED, typeof key !== 'string' || !key);
 
@@ -22,7 +22,7 @@ function encode (payload: Payload, key: string): string {
     return `${encoded}.${signature}`;
 }
 
-function decode (token: string, key: string): Payload {
+export function decode (token: string, key: string): Payload {
     validate(ERROR.TOKEN_REQUIRED, typeof token !== 'string' || !token);
     validate(ERROR.KEY_REQUIRED, typeof key !== 'string' || !key);
 
@@ -42,14 +42,7 @@ function decode (token: string, key: string): Payload {
     return payload;
 }
 
-const header = base64Encode({ typ: 'JWT', alg: 'HS256' });
-
-export default {
-    encode,
-    decode,
-    header,
-    ERROR
-};
+export const header = base64Encode({ typ: 'JWT', alg: 'HS256' });
 
 function sign (encoded: string, key: string): string {
     return createHmac('sha256', key).update(`${header}.${encoded}`).digest('base64url');

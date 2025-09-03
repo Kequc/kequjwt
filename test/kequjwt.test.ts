@@ -1,6 +1,6 @@
 import assert from 'assert';
 import 'kequtest';
-import jwt from '../src/kequjwt';
+import * as jwt from '../src/kequjwt';
 
 function plusHours(count: number): number {
     return Math.floor(Date.now() / 1000) + (60 * 60 * count);
